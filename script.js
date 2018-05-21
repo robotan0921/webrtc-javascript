@@ -57,21 +57,13 @@ function setupCallEventHandlers(call){
     };
 
     existingCall = call;
-    // 省略
-}
 
-function setupCallEventHandlers(call){
-    // 省略
     call.on('stream', function(stream){
         addVideo(call,stream);
         setupEndCallUI();
         $('#their-id').text(call.remoteId);
     });
-    // 省略
-}
 
-function setupCallEventHandlers(call){
-    // 省略
     call.on('close', function(){
         removeVideo(call.remoteId);
         setupMakeCallUI();
