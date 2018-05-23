@@ -1,5 +1,3 @@
-# SkyWay JS SDK Tutorial
+# WebRTC sample app
 
-Please refer to the URL below for further details.
-
-https://webrtc.ecl.ntt.com/en/js-tutorial.html
+### https://robotan0921.github.io/webrtc-sample/index.html 
