@@ -65,7 +65,7 @@ $('#end-call').click(function() {
 
 peer.on('call', function(call) {
     $('#debug').append(call.metadata);
-    location = call.match(/\d{*}/g)
+    location = call.match(/\d{*}/g);
     var container = document.getElementById("debug");
     var item = document.createElement("li");
     item.textContent = location[0];
