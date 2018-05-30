@@ -50,7 +50,8 @@
     <div id="map"></div>
     <script>
       function initMap() {
-        var gps = {lat: parseFloat(theirLocation[0]), lng: parseFloat(theirLocation[1])};
+        var gps = {lat: 35.610722, lng: 139.748028};
+        // var gps = {lat: parseFloat(theirLocation[0]), lng: parseFloat(theirLocation[1])};
         var map = new google.maps.Map(document.getElementById('map'), {
           zoomLog: 17,
           center: gps
