@@ -66,12 +66,13 @@ $('#end-call').click(function() {
 peer.on('call', function(call) {
     $('#debug').text(call.metadata);
     theirLocation = call.metadata.match(/\d{1,}.\d{1,}/g);
-    // var container = document.getElementById("debug");
-    // var item1 = document.createElement("li");
-    // item.textContent = theirLocation[0];
-    // container.appendChild(item);
-    // item.textContent = theirLocation[1];
-    // container.appendChild(item);
+    var container = document.getElementById("debug");
+    var item = document.createElement("li");
+    item.textContent = theirLocation[0];
+    container.appendChild(item);
+    var item2 = document.createElement("li");
+    item2.textContent = theirLocation[1];
+    container.appendChild(item2);
 
     call.answer(localStream);
     setupCallEventHandlers(call);
