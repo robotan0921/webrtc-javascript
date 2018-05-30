@@ -4,6 +4,12 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>SkyWay JS SDK Tutorial</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+      #map {
+        height: 400px;
+        width: 100%;
+       }
+    </style>
 </head>
 <div class="pure-g">
 
@@ -29,8 +35,30 @@
             <button href="#" class="pure-button pure-button-success" type="submit">End Call</button>
         </form>
         <p>List: <div id="list">...</div></p>
-        <p>Log: <span id="debug">...</span></p>
+        
+        <h5>Debug:</h3>
+        <ul id=debug type="disc">
+        </ul>
     </div>
+
+    <!-- Map area -->
+    <div id="map"></div>
+    <script>
+      function initMap() {
+        var gps = {lat: location[0], lng: location[1]};
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoomLog: Latitude:3: 17,
+          center: here
+        });
+        var marker = new google.maps.Marker({
+          position: gps,
+          map: map
+        });
+      }
+    </script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC9QOIcdcpHQ-CVg_2YCQ-We7J2Z9-nNnI&callback=initMap">
+    </script>
 </div>
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script type="text/javascript" src="https://cdn.webrtc.ecl.ntt.com/skyway-latest.js"></script>

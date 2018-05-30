@@ -6,6 +6,8 @@ let peer = null;
 let existingCall = null;
 let listPeerIds = [];
 
+var location = [];
+
 navigator.mediaDevices.getUserMedia({video: true, audio: true})
     .then(function (stream) {
         // Success
@@ -62,7 +64,13 @@ $('#end-call').click(function() {
 });
 
 peer.on('call', function(call) {
-    $('#debug').text(call.metadata);
+    $('#debug').append(call.metadata);
+    location = call.match(/\d{*}/g)
+    var container = document.getElementById("debug");
+    var item = document.createElement("li");
+    item.textContent = location[0];
+    container.appendChild(item); 
+
     call.answer(localStream);
     setupCallEventHandlers(call);
 });
