@@ -53,7 +53,7 @@
         var gps = {lat: 35.610722, lng: 139.748028};
         // var gps = {lat: parseFloat(theirLocation[0]), lng: parseFloat(theirLocation[1])};
         var map = new google.maps.Map(document.getElementById('map'), {
-          zoomLog: 17,
+          zoom: 17,
           center: gps
         });
         var marker = new google.maps.Marker({
@@ -62,8 +62,8 @@
         });
       }
     </script>
-    <script defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC9QOIcdcpHQ-CVg_2YCQ-We7J2Z9-nNnI&callback=initMap">
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC9QOIcdcpHQ-CVg_2YCQ-We7J2Z9-nNnI&callback=">
     </script>
 </div>
 </html>
