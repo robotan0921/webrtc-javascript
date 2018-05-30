@@ -42,27 +42,25 @@
 
     </div>
 
+    <!-- Map area -->
+    <div id="map"></div>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC9QOIcdcpHQ-CVg_2YCQ-We7J2Z9-nNnI"></script>
+    <script type="text/javascript">   
+    function initMap() {
+        var gps = {lat: Number(theirLocation[0]), lng: Number(theirLocation[1])};
+        var map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 17,
+            center: gps
+        });
+        var marker = new google.maps.Marker({
+            position: gps,
+            map: map,
+            animation: google.maps.Animation.BOUNCE
+        });
+    }
+    </script>>
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script type="text/javascript" src="https://cdn.webrtc.ecl.ntt.com/skyway-latest.js"></script>
     <script type="text/javascript" src="script.js"></script>
-
-    <!-- Map area -->
-    <div id="map"></div>
-    <script>
-      function initMap() {
-        var gps = {lat: parseFloat(theirLocation[0]), lng: parseFloat(theirLocation[1])};
-        var map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 17,
-          center: gps
-        });
-        var marker = new google.maps.Marker({
-          position: gps,
-          map: map
-        });
-      }
-    </script>
-    <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC9QOIcdcpHQ-CVg_2YCQ-We7J2Z9-nNnI&callback=">
-    </script>
 </div>
 </html>
