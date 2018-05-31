@@ -32,9 +32,12 @@ peer.on('open', function() {
         let peerId = peers[i];
         if (peer.id != peerId) {
           listPeerIds.push(peerId)
+          var container = document.getElementById("peerList");
+          var item = document.createElement("li", {class: "mdl-list__item"});
+          item.innerHTML = '<span class="mdl-list__item-primary-content">'+ listPeerIds[i] +'</span>';
+          container.appendChild(item);
         }
       }
-      $('#list').text(listPeerIds);
     });
 });
 
@@ -68,14 +71,14 @@ peer.on('call', function(call) {
     setupCallEventHandlers(call);
 
     $('#debug').text(call.metadata);
-    theirLocation = call.metadata.match(/\d{1,}.\d{1,}/g);
-    var container = document.getElementById("debug");
-    var item = document.createElement("li");
-    item.textContent = "lat: " + Number(theirLocation[0]);
-    container.appendChild(item);
-    var item2 = document.createElement("li");
-    item2.textContent = "lng: " + Number(theirLocation[1]);
-    container.appendChild(item2);
+    // theirLocation = call.metadata.match(/\d{1,}.\d{1,}/g);
+    // var container = document.getElementById("debug");
+    // var item = document.createElement("li");
+    // item.textContent = "lat: " + Number(theirLocation[0]);
+    // container.appendChild(item);
+    // var item2 = document.createElement("li");
+    // item2.textContent = "lng: " + Number(theirLocation[1]);
+    // container.appendChild(item2);
     initMap();
 });
 
