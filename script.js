@@ -6,7 +6,7 @@ let peer = null;
 let existingCall = null;
 let listPeerIds = [];
 
-let theirLocation = [];
+let jsonMetadata = null;
 
 navigator.mediaDevices.getUserMedia({video: true, audio: true})
     .then(function (stream) {
@@ -33,8 +33,9 @@ peer.on('open', function() {
         if (peer.id != peerId) {
           listPeerIds.push(peerId)
           var container = document.getElementById("peerList");
-          var item = document.createElement("li", {class: "mdl-list__item"});
-          item.innerHTML = '<span class="mdl-list__item-primary-content">'+ listPeerIds[i] +'</span>';
+          var item = document.createElement("li");
+          item.className = 'mdl-list__item';
+          item.innerHTML = '<span class="mdl-list__item-primary-content"><i class="material-icons mdl-list__item-icon">person</i>'+ listPeerIds[i] +'</span>';
           container.appendChild(item);
         }
       }
@@ -70,15 +71,18 @@ peer.on('call', function(call) {
     call.answer(localStream);
     setupCallEventHandlers(call);
 
-    $('#debug').text(call.metadata);
-    // theirLocation = call.metadata.match(/\d{1,}.\d{1,}/g);
-    // var container = document.getElementById("debug");
-    // var item = document.createElement("li");
-    // item.textContent = "lat: " + Number(theirLocation[0]);
-    // container.appendChild(item);
-    // var item2 = document.createElement("li");
-    // item2.textContent = "lng: " + Number(theirLocation[1]);
-    // container.appendChild(item2);
+    if (typeof call.metadata == "string") {
+      $('#debug').text(call.metadata);
+      jsonMetadata = JSON.parse(call.metadata);
+    }
+    else if (typeof call.metadata == "object") {
+       jsonMetadata = call.metadata;
+       $('#debug').text(JSON.stringify(jsonMetadata));
+    }
+    else {
+      $('#debug').text(typeof call.metadata);
+    }
+
     initMap();
 });
 

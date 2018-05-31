@@ -75,14 +75,17 @@
         text-align: center;
     }
     #end-call {
-        /* display: none; */
+        display: none;
     }
     #my-id {
         font-weight: bold;
     }
     #map {
       height: 400px;
-      width: 100%;
+      width: 50%;
+    }
+    .demo-list-icon {
+      width: 300px;
     }
     </style>
   </head>
@@ -144,17 +147,20 @@
       </div>
       <main class="mdl-layout__content mdl-color--grey-100">
         <div class="mdl-grid mdl-shadow--2dp mdl-color--white">
+          <!-- Profile area -->
+          <div class="mdl-cell mdl-cell--2-col" id="profile">
+            <img src="images/user.jpg" class="demo-avatar">
+          </div>
           <!-- Video area -->
-          <div class="mdl-cell mdl-cell--8-col" id="video-container">
+          <div class="mdl-cell mdl-cell--7-col" id="video-container">
             <video id="their-video" autoplay></video>
             <video id="my-video" muted="true" autoplay></video>
           </div>
 
           <!-- Steps -->
-          <div class="mdl-cell mdl-cell--4-col">
+          <div class="mdl-cell mdl-cell--3-col">
             <h2>Video Chat</h2>
-            <p>Your id: <span id="my-id">...</span></p>
-            <p>Share this id with others so they can call you.</p>
+            <p>My ID: <span id="my-id">...</span></p>
             <form id="make-call" class="pure-form">
               <!-- Textfield with Floating Label -->
               <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
@@ -170,21 +176,21 @@
               <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">End Call</button>
             </form>
             <h5>List:</h5>
-            <ul class='mdl-list' id="peerList">
+            <ul class='demo-list-icon mdl-list' id="peerList">
             </ul>
             <h5>Debug:</h5>
-              <ul id="debug" type="disc">
-              </ul>
+            <ul id="debug" type="disc">
+            </ul>
             </div>
           </div>
           <!-- Map area -->
-          <div id="map"></div>
+          <div id="map" class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--8-col"></div>
           <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC9QOIcdcpHQ-CVg_2YCQ-We7J2Z9-nNnI"></script>
           <script type="text/javascript">
           function initMap() {
-              var gps = {lat: Number(theirLocation[0]), lng: Number(theirLocation[1])};
+              var gps = {lat: Number(jsonMetadata.latitude), lng: Number(jsonMetadata.longitude)};
               var map = new google.maps.Map(document.getElementById('map'), {
-                  zoom: 17,
+                  zoom: 10,
                   center: gps
               });
               var marker = new google.maps.Marker({
