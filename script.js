@@ -3,6 +3,8 @@
 let localStream = null;
 
 let peer = null;
+let dataConnection;
+
 let existingCall = null;
 let listPeerIds = [];
 
@@ -60,12 +62,33 @@ $('#make-call').submit(function(e) {
         browser: checkBrowser()
       },
     });
+    dataConnection = peer.connect($('#callto-id').val());
+		dataConnection.on("open", function() {
+			$("#debug").append($("<p>").text(dataConnection.id + ": Data connection is open."));
+		});
+		dataConnection.on("data", function () {
+      $("#debug").append($("<p>").text(dataConnection.id + ": " + data).css("font-weight", "bold"));
+    });
     setupCallEventHandlers(call);
 });
 
 $('#end-call').click(function() {
     existingCall.close();
+    dataConnection.close();
 });
+
+	$("#connect").click(function() {
+		var peer_id = $('#peer-id-input').val();
+
+	});
+
+// 	$("#send").click(function() {
+// 		var message = $("#message").val();
+// 		dataConnection.send(message);
+// 		$("#messages").append($("<p>").html(peer.id + ": " + message));
+// 		$("#message").val("");
+// 	});
+
 
 peer.on('call', function(call) {
     call.answer(localStream);
@@ -83,7 +106,17 @@ peer.on('call', function(call) {
       $('#debug').text(typeof call.metadata);
     }
 
-    initMap();
+    updateMap();
+});
+
+peer.on('connection',　function(connection) {
+		dataConnection = connection;
+		dataConnection.on("open", function() {
+			$("#debug").append($("<p>").text(dataConnection.id + ": Data connection is open"));
+		});
+		dataConnection.on('data', function onRecvMessage(data) {
+    	$("#messages").append($("<p>").text(dataConnection.id + ": " + data).css("font-weight", "bold"));
+    });
 });
 
 function setupCallEventHandlers(call){
@@ -95,6 +128,9 @@ function setupCallEventHandlers(call){
 
     call.on('stream', function(stream){
         addVideo(call, stream);
+        // FIXME: Rendering
+        renderStart();
+
         setupEndCallUI();
         $('#their-id').text(call.remoteId);
     });
@@ -122,6 +158,8 @@ function setupEndCallUI() {
     $('#make-call').hide();
     $('#end-call').show();
 }
+
+
 
 function checkOs() {
   let os, ua = navigator.userAgent;

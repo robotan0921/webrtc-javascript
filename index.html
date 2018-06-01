@@ -82,7 +82,8 @@
     }
     #map {
       height: 400px;
-      width: 50%;
+      width: 100%;
+      background-color: #eee;
     }
     .demo-list-icon {
       width: 300px;
@@ -148,17 +149,75 @@
       <main class="mdl-layout__content mdl-color--grey-100">
         <div class="mdl-grid mdl-shadow--2dp mdl-color--white">
           <!-- Profile area -->
-          <div class="mdl-cell mdl-cell--2-col" id="profile">
-            <img src="images/user.jpg" class="demo-avatar">
+          <div class="mdl-cell mdl-cell--3-col" id="profile">
+            <div class="mdl-card">
+              <div class="mdl-card__media">
+                <img src="images/dog.png" width="173" height="157" border="0" alt=""
+                style="padding:10px;">
+              </div>
+              <div class="mdl-card__supporting-text">
+                <!-- Simple list -->
+                <style>
+                .demo-list-item {
+                  width: 300px;
+                }
+              </style>
+
+              <ul class="demo-list-item mdl-list">
+                <li class="mdl-list__item">
+                  <span class="mdl-list__item-primary-content">Name: </span>
+                </li>
+                <li class="mdl-list__item">
+                  <span class="mdl-list__item-primary-content">Age: </span>
+                </li>
+                <li class="mdl-list__item">
+                  <span class="mdl-list__item-primary-content">msg: </span>
+                </li>
+              </ul>
+              </div>
+              <!-- Map area -->
+              <div id="map"></div>
+              <script type="text/javascript">
+              var map;
+              function initMap() {
+                  var tokyo = {lat: 35.681382, lng: 139.766084};
+                  map = new google.maps.Map(document.getElementById('map'), {
+                    zoom: 15,
+                    center: tokyo
+                  });
+              }
+              function updateMap() {
+                  var gps = {lat: Number(jsonMetadata.latitude), lng: Number(jsonMetadata.longitude)};
+                  map.panTo(gps);
+                  var marker = new google.maps.Marker({
+                      position: gps,
+                      map: map,
+                      animation: google.maps.Animation.BOUNCE
+                  });
+              }
+              </script>
+              <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC9QOIcdcpHQ-CVg_2YCQ-We7J2Z9-nNnI&callback=initMap"></script>
+            </div>
           </div>
           <!-- Video area -->
           <div class="mdl-cell mdl-cell--7-col" id="video-container">
+            <h5 id="RealtimeClock"></h5>
+            <script type="text/javascript">
+            setInterval(function() {
+              var nowTime = new Date();
+              var date = nowTime.getFullYear() + "/" + ("0"+(nowTime.getMonth() + 1)).slice(-2) + "/" + ("0"+(nowTime.getDate())).slice(-2);
+              var time = ("0"+(nowTime.getHours())).slice(-2) + " : " + ("0"+(nowTime.getMinutes())).slice(-2) + " : " + ("0"+(nowTime.getSeconds())).slice(-2);
+              document.getElementById("RealtimeClock").innerHTML = date + "    " + time;
+            }, 1000);
+            </script>
+            <!-- <video id="their-video" autoplay></video> -->
             <video id="their-video" autoplay></video>
+            <canvas id="display_canvas"></canvas>
             <video id="my-video" muted="true" autoplay></video>
           </div>
 
           <!-- Steps -->
-          <div class="mdl-cell mdl-cell--3-col">
+          <div class="mdl-cell mdl-cell--2-col">
             <h2>Video Chat</h2>
             <p>My ID: <span id="my-id">...</span></p>
             <form id="make-call" class="pure-form">
@@ -179,12 +238,12 @@
             <ul class='demo-list-icon mdl-list' id="peerList">
             </ul>
             <h5>Debug:</h5>
-            <ul id="debug" type="disc">
+            <div id="debug"></div>
             </ul>
             </div>
           </div>
           <!-- Map area -->
-          <div id="map" class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--8-col"></div>
+          <!-- <div id="map" class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--8-col"></div>
           <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC9QOIcdcpHQ-CVg_2YCQ-We7J2Z9-nNnI"></script>
           <script type="text/javascript">
           function initMap() {
@@ -199,7 +258,7 @@
                   animation: google.maps.Animation.BOUNCE
               });
           }
-          </script>
+          </script> -->
           <div class="demo-charts mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-grid">
             <svg fill="currentColor" width="200px" height="200px" viewBox="0 0 1 1" class="demo-chart mdl-cell mdl-cell--4-col mdl-cell--3-col-desktop">
               <use xlink:href="#piechart" mask="url(#piemask)" />
@@ -331,5 +390,6 @@
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script type="text/javascript" src="https://cdn.webrtc.ecl.ntt.com/skyway-latest.js"></script>
     <script type="text/javascript" src="script.js"></script>
+    <script type="text/javascript" src="render.js"></script>
   </body>
 </html>
