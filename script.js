@@ -64,8 +64,7 @@ $(function() {
     e.preventDefault();
     const call = peer.call($('#callto-id').val(), localStream, {
       metadata: {
-        os: checkOs(),
-        browser: checkBrowser()
+        name: checkBrowser() + " on " + checkOs()
       },
     });
     dataConnection = peer.connect($('#callto-id').val());
