@@ -21,7 +21,8 @@ function renderStart() {
     src = bufferContext.getImageData(0, 0, width, height); // カメラ画像のデータ
     dest = bufferContext.createImageData(buffer.width, buffer.height); // 空のデータ（サイズはカメラ画像と一緒）
 
-    contrast();
+    // contrast();
+    edge(width, height);
 
 
     displayContext.putImageData(dest, 0, 0);
@@ -35,5 +36,19 @@ function contrast() {
     dest.data[i + 1] = 255 - src.data[i + 1]; // Green
     dest.data[i + 2] = 255 - src.data[i + 2]; // Blue
     dest.data[i + 3] = 255;                     // Alpha
+  }
+}
+
+function edge(width, height) {
+  for (var y = 1; y < height-1; y += 1) {
+    for (var x = 1; x < width-1; x += 1) {
+      for (var c = 0; c < 3; c += 1) {
+        var i = (y*width + x)*4 + c;
+        dest.data[i] = 127 + -src.data[i - width*4 - 4] -   src.data[i - width*4] - src.data[i - width*4 + 4] +
+        -src.data[i - 4]       + 8*src.data[i]       - src.data[i + 4] +
+        -src.data[i + width*4 - 4] -   src.data[i + width*4] - src.data[i + width*4 + 4];
+      }
+      dest.data[(y*width + x)*4 + 3] = 255; // Alpha
+    }
   }
 }

@@ -1,35 +1,24 @@
 'use strict';
 
-let localStream = null;
-
-let peer = null;
 let dataConnection;
-
-let existingCall = null;
-let listPeerIds = [];
-
 let jsonMetadata = null;
 
-navigator.mediaDevices.getUserMedia({video: true, audio: true})
-    .then(function (stream) {
-        // Success
-        $('#my-video').get(0).srcObject = stream;
-        localStream = stream;
-    }).catch(function (error) {
-        // Error
-        console.error('mediaDevice.getUserMedia() error:', error);
-        return;
-    });
+$(function() {
 
-peer = new Peer( {
+  const peer = new Peer( {
     key: '50177f5e-e3db-48e4-934a-90ffb8f9f043',
     debug: 3
-});
+  });
 
-peer.on('open', function() {
+  let localStream = null;
+  let existingCall = null;
+
+  peer.on('open', function() {
     $('#my-id').text(peer.id);
+    step1();
 
     peer.listAllPeers(function(peers) {
+      let listPeerIds = [];
       for (let i = 0; i < peers.length; i++) {
         let peerId = peers[i];
         if (peer.id != peerId) {
@@ -42,19 +31,36 @@ peer.on('open', function() {
         }
       }
     });
-});
+  });
 
-peer.on('error', function(err) {
+  peer.on('call', function(call) {
+    call.answer(localStream);
+    step3(call);
+
+    if (typeof call.metadata == "string") {
+      $('#debug').text(call.metadata);
+      jsonMetadata = JSON.parse(call.metadata);
+    }
+    else if (typeof call.metadata == "object") {
+      jsonMetadata = call.metadata;
+      $('#debug').text(JSON.stringify(jsonMetadata));
+    }
+    else {
+      $('#debug').text(typeof call.metadata);
+    }
+
+    updateMap();
+  });
+
+  peer.on('error', function(err) {
     alert(err.message);
-});
+    step2();
+  });
 
-peer.on('close', function() {
-});
+  peer.on('disconnected', function() {
+  });
 
-peer.on('disconnected', function() {
-});
-
-$('#make-call').submit(function(e) {
+  $('#make-call').submit(function(e) {
     e.preventDefault();
     const call = peer.call($('#callto-id').val(), localStream, {
       metadata: {
@@ -63,191 +69,224 @@ $('#make-call').submit(function(e) {
       },
     });
     dataConnection = peer.connect($('#callto-id').val());
-		dataConnection.on("open", function() {
-			$("#debug").append($("<p>").text(dataConnection.id + ": Data connection is open."));
-		});
-		dataConnection.on("data", function () {
+    dataConnection.on("open", function() {
+    	$("#debug").append($("<p>").text(dataConnection.id + ": Data connection is open."));
+    });
+    dataConnection.on("data", function () {
       $("#debug").append($("<p>").text(dataConnection.id + ": " + data).css("font-weight", "bold"));
     });
-    setupCallEventHandlers(call);
-});
+    step3(call);
+  });
 
-$('#end-call').click(function() {
+  $('#end-call').click(function() {
     existingCall.close();
     dataConnection.close();
-});
+    step2();
+  });
 
-	$("#connect").click(function() {
-		var peer_id = $('#peer-id-input').val();
-
-	});
-
-// 	$("#send").click(function() {
-// 		var message = $("#message").val();
-// 		dataConnection.send(message);
-// 		$("#messages").append($("<p>").html(peer.id + ": " + message));
-// 		$("#message").val("");
-// 	});
-
-
-peer.on('call', function(call) {
-    call.answer(localStream);
-    setupCallEventHandlers(call);
-
-    if (typeof call.metadata == "string") {
-      $('#debug').text(call.metadata);
-      jsonMetadata = JSON.parse(call.metadata);
-    }
-    else if (typeof call.metadata == "object") {
-       jsonMetadata = call.metadata;
-       $('#debug').text(JSON.stringify(jsonMetadata));
-    }
-    else {
-      $('#debug').text(typeof call.metadata);
-    }
-
-    updateMap();
-});
-
-peer.on('connection',　function(connection) {
-		dataConnection = connection;
-		dataConnection.on("open", function() {
-			$("#debug").append($("<p>").text(dataConnection.id + ": Data connection is open"));
-		});
-		dataConnection.on('data', function onRecvMessage(data) {
-    	$("#messages").append($("<p>").text(dataConnection.id + ": " + data).css("font-weight", "bold"));
+  peer.on('connection',　function(connection) {
+    dataConnection = connection;
+    dataConnection.on("open", function() {
+      $("#debug").append($("<p>").text(dataConnection.id + ": Data connection is open"));
     });
-});
+    dataConnection.on('data', function onRecvMessage(data) {
+      $("#messages").append($("<p>").text(dataConnection.id + ": " + data).css("font-weight", "bold"));
+    });
+  });
 
-function setupCallEventHandlers(call){
-    if (existingCall) {
-        existingCall.close();
-    };
+	$("#send").click(function() {
+    var message = $("#message").val();
+    dataConnection.send(message);
+    $("#messages").append($("<p>").html(peer.id + ": " + message));
+    $("#message").val("");
+  });
 
-    existingCall = call;
 
-    call.on('stream', function(stream){
-        addVideo(call, stream);
-        // FIXME: Rendering
-        renderStart();
+  // set up audio and video input selectors
+  const audioSelect = $('#audioSource');
+  const videoSelect = $('#videoSource');
+  const selectors = [audioSelect, videoSelect];
 
-        setupEndCallUI();
+  navigator.mediaDevices.enumerateDevices()
+  .then(deviceInfos => {
+    const values = selectors.map(select => select.val() || '');
+    selectors.forEach(select => {
+      const children = select.children(':first');
+      while (children.length) {
+        select.remove(children);
+      }
+    });
+
+    for (let i = 0; i !== deviceInfos.length; ++i) {
+      const deviceInfo = deviceInfos[i];
+      const option = $('<option>').val(deviceInfo.deviceId);
+
+      if (deviceInfo.kind === 'audioinput') {
+        option.text(deviceInfo.label ||
+          'Microphone ' + (audioSelect.children().length + 1));
+          audioSelect.append(option);
+        } else if (deviceInfo.kind === 'videoinput') {
+          option.text(deviceInfo.label ||
+            'Camera ' + (videoSelect.children().length + 1));
+            videoSelect.append(option);
+          }
+        }
+
+        selectors.forEach((select, selectorIndex) => {
+          if (Array.prototype.slice.call(select.children()).some(n => {
+            return n.value === values[selectorIndex];
+          })) {
+            select.val(values[selectorIndex]);
+          }
+        });
+
+        videoSelect.on('change', step1);
+        audioSelect.on('change', step1);
+      });
+
+      function step1() {
+        // Get audio/video stream
+        const audioSource = $('#audioSource').val();
+        const videoSource = $('#videoSource').val();
+        const constraints = {
+          audio: {deviceId: audioSource ? {exact: audioSource} : undefined},
+          video: {deviceId: videoSource ? {exact: videoSource} : undefined},
+        };
+
+        navigator.mediaDevices.getUserMedia(constraints).then(stream => {
+          // Success
+          $('#my-video').get(0).srcObject = stream;
+          localStream = stream;
+
+          if (existingCall) {
+            existingCall.replaceStream(stream);
+            return;
+          }
+
+          step2();
+        }).catch(err => {
+          // Error
+          console.error('mediaDevice.getUserMedia() error:', err);
+        });
+      }
+
+      function step2() {
+        // $('#step1, #step3').hide();
+        $('#step2').show();
+        $('#callto-id').focus();
+      }
+
+      function step3(call) {
+        // Hang up on an existing call if present
+        if (existingCall) {
+          existingCall.close();
+        }
+        // Wait for stream on the call, then set peer video display
+        call.on('stream', stream => {
+          const el = $('#their-video').get(0);
+          el.srcObject = stream;
+          el.play();
+          renderStart();
+        });
+
+        // UI stuff
+        existingCall = call;
         $('#their-id').text(call.remoteId);
+        call.on('close', step2);
+        $('#step1, #step2').hide();
+        $('#step3').show();
+      }
     });
 
-    call.on('close', function(){
-        removeVideo(call.remoteId);
-        setupMakeCallUI();
-    });
+
+
+    function checkOs() {
+      let os, ua = navigator.userAgent;
+
+      if (ua.match(/Win(dows )?NT 10\.0/)) {
+        os = "Windows 10";				// Windows 10 の処理
+      }
+      else if (ua.match(/Win(dows )?NT 6\.3/)) {
+        os = "Windows 8.1";				// Windows 8.1 の処理
+      }
+      else if (ua.match(/Win(dows )?NT 6\.2/)) {
+        os = "Windows 8";				// Windows 8 の処理
+      }
+      else if (ua.match(/Win(dows )?NT 6\.1/)) {
+        os = "Windows 7";				// Windows 7 の処理
+      }
+      else if (ua.match(/Win(dows )?NT 6\.0/)) {
+        os = "Windows Vista";				// Windows Vista の処理
+      }
+      else if (ua.match(/Win(dows )?NT 5\.2/)) {
+        os = "Windows Server 2003";			// Windows Server 2003 の処理
+      }
+      else if (ua.match(/Win(dows )?(NT 5\.1|XP)/)) {
+        os = "Windows XP";				// Windows XP の処理
+      }
+      else if (ua.match(/Win(dows)? (9x 4\.90|ME)/)) {
+        os = "Windows ME";				// Windows ME の処理
+      }
+      else if (ua.match(/Win(dows )?(NT 5\.0|2000)/)) {
+        os = "Windows 2000";				// Windows 2000 の処理
+      }
+      else if (ua.match(/Win(dows )?98/)) {
+        os = "Windows 98";				// Windows 98 の処理
+      }
+      else if (ua.match(/Win(dows )?NT( 4\.0)?/)) {
+        os = "Windows NT";				// Windows NT の処理
+      }
+      else if (ua.match(/Win(dows )?95/)) {
+        os = "Windows 95";				// Windows 95 の処理
+      }
+      else if (ua.match(/iPhone|iPad/)) {
+        os = "iOS";					// iOS (iPhone, iPod touch, iPad) の処理
+
+        /*
+        if (ua.match(/(iPhone|CPU) OS ([\d_]+)/)) {
+        os = "iOS " + RegExp.$2;
+        os = os.replace(/_/g, ".");
+      }
+      else {
+      os = "iOS";
+    }
+    */
+  }
+  else if (ua.match(/Mac|PPC/)) {
+    os = "Mac OS";					// Macintosh の処理
+
+    /*
+    if (ua.match(/OS X|MSIE 5\.2/)) {
+    if (ua.match(/Mac OS X ([\.\d_]+)/)) {
+    os = "macOS " + RegExp.$1;
+    os = os.replace(/_/g, ".");
+  }
+  else {
+  os = "macOS";
+}
+}
+else {
+os = "Classic Mac OS";
+}
+*/
+}
+else if (ua.match(/Android ([\.\d]+)/)) {
+  os = "Android " + RegExp.$1;			// Android の処理
+}
+else if (ua.match(/Linux/)) {
+  os = "Linux";					// Linux の処理
+}
+else if (ua.match(/^.*\s([A-Za-z]+BSD)/)) {
+  os = RegExp.$1;					// BSD 系の処理
+}
+else if (ua.match(/SunOS/)) {
+  os = "Solaris";					// Solaris の処理
+}
+else {
+  os = "N/A";					// 上記以外 OS の処理
 }
 
-function addVideo(call,stream){
-    $('#their-video').get(0).srcObject = stream;
-}
-
-function removeVideo(peerId){
-    $('#their-video').get(0).srcObject = undefined;
-}
-
-function setupMakeCallUI(){
-    $('#make-call').show();
-    $('#end-call').hide();
-}
-
-function setupEndCallUI() {
-    $('#make-call').hide();
-    $('#end-call').show();
-}
-
-
-
-function checkOs() {
-  let os, ua = navigator.userAgent;
-
-	if (ua.match(/Win(dows )?NT 10\.0/)) {
-		os = "Windows 10";				// Windows 10 の処理
-	}
-	else if (ua.match(/Win(dows )?NT 6\.3/)) {
-		os = "Windows 8.1";				// Windows 8.1 の処理
-	}
-	else if (ua.match(/Win(dows )?NT 6\.2/)) {
-		os = "Windows 8";				// Windows 8 の処理
-	}
-	else if (ua.match(/Win(dows )?NT 6\.1/)) {
-		os = "Windows 7";				// Windows 7 の処理
-	}
-	else if (ua.match(/Win(dows )?NT 6\.0/)) {
-		os = "Windows Vista";				// Windows Vista の処理
-	}
-	else if (ua.match(/Win(dows )?NT 5\.2/)) {
-		os = "Windows Server 2003";			// Windows Server 2003 の処理
-	}
-	else if (ua.match(/Win(dows )?(NT 5\.1|XP)/)) {
-		os = "Windows XP";				// Windows XP の処理
-	}
-	else if (ua.match(/Win(dows)? (9x 4\.90|ME)/)) {
-		os = "Windows ME";				// Windows ME の処理
-	}
-	else if (ua.match(/Win(dows )?(NT 5\.0|2000)/)) {
-		os = "Windows 2000";				// Windows 2000 の処理
-	}
-	else if (ua.match(/Win(dows )?98/)) {
-		os = "Windows 98";				// Windows 98 の処理
-	}
-	else if (ua.match(/Win(dows )?NT( 4\.0)?/)) {
-		os = "Windows NT";				// Windows NT の処理
-	}
-	else if (ua.match(/Win(dows )?95/)) {
-		os = "Windows 95";				// Windows 95 の処理
-	}
-	else if (ua.match(/iPhone|iPad/)) {
-		os = "iOS";					// iOS (iPhone, iPod touch, iPad) の処理
-
-		/*
-		if (ua.match(/(iPhone|CPU) OS ([\d_]+)/)) {
-			os = "iOS " + RegExp.$2;
-			os = os.replace(/_/g, ".");
-		}
-		else {
-			os = "iOS";
-		}
-		*/
-	}
-	else if (ua.match(/Mac|PPC/)) {
-		os = "Mac OS";					// Macintosh の処理
-
-		/*
-		if (ua.match(/OS X|MSIE 5\.2/)) {
-			if (ua.match(/Mac OS X ([\.\d_]+)/)) {
-				os = "macOS " + RegExp.$1;
-				os = os.replace(/_/g, ".");
-			}
-			else {
-				os = "macOS";
-			}
-		}
-		else {
-			os = "Classic Mac OS";
-		}
-		*/
-	}
-	else if (ua.match(/Android ([\.\d]+)/)) {
-		os = "Android " + RegExp.$1;			// Android の処理
-	}
-	else if (ua.match(/Linux/)) {
-		os = "Linux";					// Linux の処理
-	}
-	else if (ua.match(/^.*\s([A-Za-z]+BSD)/)) {
-		os = RegExp.$1;					// BSD 系の処理
-	}
-	else if (ua.match(/SunOS/)) {
-		os = "Solaris";					// Solaris の処理
-	}
-	else {
-		os = "N/A";					// 上記以外 OS の処理
-	}
-
-  return os;
+return os;
 }
 
 function checkBrowser() {
