@@ -22,7 +22,7 @@ function renderStart() {
     dest = bufferContext.createImageData(buffer.width, buffer.height); // 空のデータ（サイズはカメラ画像と一緒）
 
     // contrast();
-    edge(width, height);
+    // edge(width, height);
 
 
     displayContext.putImageData(dest, 0, 0);

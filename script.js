@@ -34,16 +34,21 @@ $(function() {
   });
 
   peer.on('call', function(call) {
-    call.answer(localStream);
+    call.answer(localStream, {
+      videoBandwidth: 2000,
+      videoCodec: 'VP9'
+    });
     step3(call);
 
     if (typeof call.metadata == "string") {
       $('#debug').text(call.metadata);
+      localStorage.setItem("jsonMetadata", jsonMetadata);
       jsonMetadata = JSON.parse(call.metadata);
     }
     else if (typeof call.metadata == "object") {
       jsonMetadata = call.metadata;
       $('#debug').text(JSON.stringify(jsonMetadata));
+      localStorage.setItem(jsonMetadata, jsonMetadata);
     }
     else {
       $('#debug').text(typeof call.metadata);
@@ -66,6 +71,8 @@ $(function() {
       metadata: {
         name: checkBrowser() + " on " + checkOs()
       },
+      videoBandwidth: 2000,
+      videoCodec: 'VP9'
     });
     dataConnection = peer.connect($('#callto-id').val());
     dataConnection.on("open", function() {
