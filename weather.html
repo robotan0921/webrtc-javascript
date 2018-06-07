@@ -147,7 +147,7 @@ limitations under the License
       $(function () {
         var API_KEY = 'f31ed1d2bcde371b7f7c769c07491313';
         var city = 'Tokyo';
-        var url = 'http://api.openweathermap.org/data/2.5/weather?q=' + city + ',jp&units=metric&APPID=' + API_KEY;
+        var url = 'https://api.openweathermap.org/data/2.5/weather?q=' + city + ',jp&units=metric&APPID=' + API_KEY;
         $.getJSON(url, function(data) {
           console.log(data);
           if (!data.cod || data.cod != 200) {
