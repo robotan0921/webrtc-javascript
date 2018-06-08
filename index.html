@@ -81,6 +81,9 @@ limitations under the License
   z-index: 5
 }
 #logger {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #000;
+  text-align: center;
   z-index: 10
 }
 #step1-error, #step2, #step3 {
@@ -209,13 +212,13 @@ limitations under the License
         </div>
         <!-- Video area -->
         <div class="mdl-cell mdl-cell--7-col" id="video-container">
-          <h3 id="RealtimeClock" ></h3>
+          <h3 id="realtimeClock" ></h3>
           <script type="text/javascript">
           setInterval(function() {
             var nowTime = new Date();
-            var date = nowTime.getFullYear() + "/" + ("0"+(nowTime.getMonth() + 1)).slice(-2) + "/" + ("0"+(nowTime.getDate())).slice(-2);
+            var date = nowTime.toDateString();
             var time = ("0"+(nowTime.getHours())).slice(-2) + " : " + ("0"+(nowTime.getMinutes())).slice(-2) + " : " + ("0"+(nowTime.getSeconds())).slice(-2);
-            document.getElementById("RealtimeClock").innerHTML = date + "    " + time;
+            document.getElementById("realtimeClock").innerHTML = date + "<br>" + time;
           }, 1000);
           </script>
           <!-- <video id="their-video" autoplay></video> -->
