@@ -192,14 +192,14 @@ $(function() {
           const el = $('#their-video').get(0);
           el.srcObject = stream;
           el.play();
-          renderStart();
+          // renderStart();
         });
 
         // UI stuff
         existingCall = call;
         $('#their-id').text(call.remoteId);
         call.on('close', step2);
-        $('#step1, #step2').hide();
+        // $('#step1, #step2').hide();
         $('#step3').show();
       }
     });
