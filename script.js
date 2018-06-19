@@ -56,12 +56,12 @@ $(function() {
     setInfo(jsonMetadata);
   });
 
-function setInfo(json) {
+  function setInfo(json) {
     $('#target_name').append(json.name);
     $('#target_age').append(json.age + " years of age");
     $('#target_msg').append(json.msg);
     updateMap();
-}
+  }
 
   peer.on('error', function(err) {
     alert(err.message);
@@ -106,13 +106,30 @@ function setInfo(json) {
     });
   });
 
-	$("#send").click(function() {
-    var message = $("#message").val();
+
+  //
+  // Remote Control
+  //
+  $('#left_button').click(function() {
+    var message = "LEFT";
     dataConnection.send(message);
     $("#messages").append($("<p>").html(peer.id + ": " + message));
-    $("#message").val("");
   });
-
+  $('#down_button').click(function() {
+    var message = "DOWN";
+    dataConnection.send(message);
+    $("#messages").append($("<p>").html(peer.id + ": " + message));
+  });
+  $('#up_button').click(function() {
+    var message = "UP";
+    dataConnection.send(message);
+    $("#messages").append($("<p>").html(peer.id + ": " + message));
+  });
+  $('#right_button').click(function() {
+    var message = "RIGHT"
+    dataConnection.send(message);
+    $("#messages").append($("<p>").html(peer.id + ": " + message));
+  });
 
   // set up audio and video input selectors
   const audioSelect = $('#audioSource');
@@ -136,27 +153,27 @@ function setInfo(json) {
       if (deviceInfo.kind === 'audioinput') {
         option.text(deviceInfo.label ||
           'Microphone ' + (audioSelect.children().length + 1));
-          audioSelect.append(option);
-        } else if (deviceInfo.kind === 'videoinput') {
-          option.text(deviceInfo.label ||
-            'Camera ' + (videoSelect.children().length + 1));
-            videoSelect.append(option);
-          }
-        }
+        audioSelect.append(option);
+      } else if (deviceInfo.kind === 'videoinput') {
+        option.text(deviceInfo.label ||
+          'Camera ' + (videoSelect.children().length + 1));
+        videoSelect.append(option);
+      }
+    }
 
-        selectors.forEach((select, selectorIndex) => {
-          if (Array.prototype.slice.call(select.children()).some(n => {
-            return n.value === values[selectorIndex];
-          })) {
-            select.val(values[selectorIndex]);
-          }
-        });
+    selectors.forEach((select, selectorIndex) => {
+      if (Array.prototype.slice.call(select.children()).some(n => {
+        return n.value === values[selectorIndex];
+      })) {
+        select.val(values[selectorIndex]);
+      }
+    });
 
-        videoSelect.on('change', step1);
-        audioSelect.on('change', step1);
-      });
+    videoSelect.on('change', step1);
+    audioSelect.on('change', step1);
+  });
 
-      function step1() {
+  function step1() {
         // Get audio/video stream
         const audioSource = $('#audioSource').val();
         const videoSource = $('#videoSource').val();
@@ -180,42 +197,41 @@ function setInfo(json) {
           // Error
           console.error('mediaDevice.getUserMedia() error:', err);
         });
-      }
+  }
 
-      function step2() {
-        // $('#step1, #step3').hide();
-        $('#step2').show();
-        $('#callto-id').focus();
-      }
+  function step2() {
+    // $('#step1, #step3').hide();
+    $('#step2').show();
+    $('#callto-id').focus();
+  }
 
-      function step3(call) {
-        // Hang up on an existing call if present
-        if (existingCall) {
-          existingCall.close();
-        }
-        // Wait for stream on the call, then set peer video display
-        call.on('stream', stream => {
-          const el = $('#their-video').get(0);
-          el.srcObject = stream;
-          el.play();
-          renderStart();
-        });
-
-        // UI stuff
-        existingCall = call;
-        $('#their-id').text(call.remoteId);
-        call.on('close', step2);
-        // $('#step1, #step2').hide();
-        $('#step3').show();
-      }
+  function step3(call) {
+    // Hang up on an existing call if present
+    if (existingCall) {
+      existingCall.close();
+    }
+    // Wait for stream on the call, then set peer video display
+    call.on('stream', stream => {
+      const el = $('#their-video').get(0);
+      el.srcObject = stream;
+      el.play();
+      renderStart();
     });
+    // UI stuff
+    existingCall = call;
+    $('#their-id').text(call.remoteId);
+    call.on('close', step2);
+    // $('#step1, #step2').hide();
+    $('#step3').show();
+  }
+});
 
 
 
-    function checkOs() {
-      let os, ua = navigator.userAgent;
+function checkOs() {
+  let os, ua = navigator.userAgent;
 
-      if (ua.match(/Win(dows )?NT 10\.0/)) {
+  if (ua.match(/Win(dows )?NT 10\.0/)) {
         os = "Windows 10";				// Windows 10 の処理
       }
       else if (ua.match(/Win(dows )?NT 6\.3/)) {
