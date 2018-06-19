@@ -48,14 +48,20 @@ $(function() {
     else if (typeof call.metadata == "object") {
       jsonMetadata = call.metadata;
       $('#debug').text(JSON.stringify(jsonMetadata));
-      localStorage.setItem(jsonMetadata, jsonMetadata);
     }
     else {
       $('#debug').text(typeof call.metadata);
     }
 
-    updateMap();
+    setInfo(jsonMetadata);
   });
+
+function setInfo(json) {
+    $('#target_name').append(json.name);
+    $('#target_age').append(json.age + " years of age");
+    $('#target_msg').append(json.msg);
+    updateMap();
+}
 
   peer.on('error', function(err) {
     alert(err.message);
@@ -192,7 +198,7 @@ $(function() {
           const el = $('#their-video').get(0);
           el.srcObject = stream;
           el.play();
-          // renderStart();
+          renderStart();
         });
 
         // UI stuff

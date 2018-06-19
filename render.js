@@ -14,20 +14,38 @@ function renderStart() {
     var width = video.videoWidth;
     var height = video.videoHeight;
     if (width == 0 || height == 0) {return;}
-    buffer.width = display.width = width;
-    buffer.height = display.height = height;
+    
+    var re_height1 = parseInt(height/2 - 3/4*width/2, 10);
+    var re_height2 = parseInt(height/2 + 3/4*width/2, 10);
+
+    buffer.width = width;
+    display.width = width;
+    buffer.height = height;
+    display.height = re_height2-re_height1;
     bufferContext.drawImage(video, 0, 0);
 
-    src = bufferContext.getImageData(0, 0, width, height); // カメラ画像のデータ
-    dest = bufferContext.createImageData(buffer.width, buffer.height); // 空のデータ（サイズはカメラ画像と一緒）
+    // src = bufferContext.getImageData(0, 0, width, height); // カメラ画像のデータ
+    // dest = bufferContext.createImageData(buffer.width, buffer.height); // 空のデータ（サイズはカメラ画像と一緒）
 
+    src = bufferContext.getImageData(0, re_height1, width, re_height2); // カメラ画像のデータ
+    dest = bufferContext.createImageData(src); // 空のデータ（サイズはカメラ画像と一緒）
+
+    duplicate();
     // contrast();
     // edge(width, height);
-
 
     displayContext.putImageData(dest, 0, 0);
   };
   render();
+}
+
+function duplicate() {
+  for (var i = 0; i < dest.data.length; i += 4) {
+    dest.data[i + 0] = src.data[i + 0]; // Red
+    dest.data[i + 1] = src.data[i + 1]; // Green
+    dest.data[i + 2] = src.data[i + 2]; // Blue
+    dest.data[i + 3] = 255;                     // Alpha
+  }
 }
 
 function contrast() {
