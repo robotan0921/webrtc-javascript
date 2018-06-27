@@ -49,6 +49,10 @@ limitations under the License
     <style>
     #overview {}
 
+    #information {
+        display: none;
+    }
+
     #navigation {
         display: none;
     }
@@ -124,6 +128,36 @@ limitations under the License
     .demo-list-icon {
         width: 300px;
     }
+
+    #layer {
+        display: none;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        width: 100%;
+        height: 100%;
+        background-color: black;
+        opacity: 0.8;
+        z-index: 50
+    }
+
+    #popup {
+        display: none;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 40%;
+        height: 40%;
+        text-align: center;
+        margin: auto;
+        background-color: rgba(255, 255, 255, 0.8);
+        border-radius: 5px;
+        font-size: 24px;
+        font-weight: bold;
+        z-index: 55
+    }
     </style>
 </head>
 
@@ -186,6 +220,17 @@ limitations under the License
         <main class="mdl-layout__content mdl-color--grey-100">
             <canvas id="display_canvas"></canvas>
             <section id="overview">
+                <!-- Popup -->
+                <div id="layer">
+                    <img src="images/Emergency.gif" width="100%" height="100%">
+                </div>
+                <div id="popup">
+                    <div class="text-center">Emergency Call</div>
+                    <p></p>
+                    <img src="images/fall.jpg" width="50%" height="50%" style="filter: grayscale(100%);">
+                    <p></p>
+                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent" id="close">OK</button>
+                </div>
                 <video id="my-video" muted="true" autoplay></video>
                 <video id="their-video" autoplay></video>
                 <div class="mdl-grid mdl-shadow--2dp mdl-color--white">
@@ -259,7 +304,7 @@ limitations under the License
                             padding: 10px;
                         }
                         </style>
-                        <div class="jumbotron" style="background-color: rgba(255, 255, 255, 0); padding: 10px;">
+                        <div class="jumbotron" style="background-color: rgba(255, 255, 255, 0.2); padding: 10px;">
                             <div id="realtimeClock" class="text-center"></div>
                             <script type="text/javascript">
                             setInterval(function() {
@@ -323,13 +368,13 @@ limitations under the License
                     <!-- Steps -->
                     <div class="mdl-cell mdl-cell--2-col" id="logger">
                         <h2>Debug</h2>
-                        <div class="select">
+                        <div class="mdl-textfield mdl-js-textfield">
                             <label for="audioSource">Audio input source: </label>
-                            <select id="audioSource"></select>
+                            <select id="audioSource" class="mdl-textfield__input"></select>
                         </div>
-                        <div class="select">
-                            <label for="videoSource">Video source: </label>
-                            <select id="videoSource"></select>
+                        <div class="mdl-textfield mdl-js-textfield">
+                            <label for="videpSource">Video source: </label>
+                            <select id="videoSource" class="mdl-textfield__input"></select>
                         </div>
                         <!-- Get local audio/video stream -->
                         <div id="step1">

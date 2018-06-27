@@ -40,6 +40,11 @@ $(function() {
         });
         step3(call);
 
+        // Popup for Emergency Call
+        // alert("Emergency Call!!!");
+        // show popupボタンクリック時の処理
+        $('#popup, #layer').show();
+
         if (typeof call.metadata == "string") {
             $('#debug').text(call.metadata);
             localStorage.setItem("jsonMetadata", jsonMetadata);
@@ -119,6 +124,12 @@ $(function() {
         });
     });
 
+
+    //
+    // Close Popup
+    $('#close, #layer').click(function() {
+        $('#popup, #layer').hide();
+    });
 
     //
     // Remote Control
