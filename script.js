@@ -3,6 +3,8 @@
 let dataConnection;
 let jsonMetadata = null;
 
+let calling = false;
+
 $(function() {
 
     const peer = new Peer({
@@ -40,6 +42,7 @@ $(function() {
         });
         step3(call);
 
+        calling = true;
         // Popup for Emergency Call
         // alert("Emergency Call!!!");
         // show popupボタンクリック時の処理

@@ -303,15 +303,34 @@ limitations under the License
                             display: inline-block;
                             padding: 10px;
                         }
+
+                        #stopWatch {
+                            font-size: 18px;
+                            font-weight: bold;
+                            padding: 10px;
+                        }
                         </style>
                         <div class="jumbotron" style="background-color: rgba(255, 255, 255, 0.2); padding: 10px;">
                             <div id="realtimeClock" class="text-center"></div>
                             <script type="text/javascript">
+                            var nowTime;
+                            var stopWatchMin = 0;
+                            var stopWatchSec = 0;
                             setInterval(function() {
-                                var nowTime = new Date();
+                                // realtimeClock
+                                nowTime = new Date();
                                 var date = nowTime.toDateString();
                                 var time = ("0" + (nowTime.getHours())).slice(-2) + " : " + ("0" + (nowTime.getMinutes())).slice(-2) + " : " + ("0" + (nowTime.getSeconds())).slice(-2);
                                 document.getElementById("realtimeClock").innerHTML = date + "<br>" + time;
+
+                                // stopWatch
+                                if (calling) {
+                                    if (stopWatchSec++ == 59) {
+                                        stopWatchSec = 0;
+                                        stopWatchMin++;
+                                    }
+                                    document.getElementById("stopWatch").innerHTML = stopWatchMin + " min " + stopWatchSec + " sec ";
+                                }
                             }, 1000);
                             </script>
                             <div id="weather" class="text-center">
@@ -350,6 +369,8 @@ limitations under the License
                             });
                         });
                         </script>
+                        <div id="stopWatch" class="text-center"></div>
+                        <p>passed from calling</p>
                         <div id="control_buttons">
                             <button id="left_button" class="mdl-button mdl-js-button mdl-button--fab mdl-button--colored">
                                 <i class="material-icons">arrow_back</i>
