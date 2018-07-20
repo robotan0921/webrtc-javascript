@@ -227,7 +227,7 @@ $(function() {
     }
 
     function step2() {
-        // $('#step1, #step3').hide();
+        $('#step1, #step3').hide();
         $('#step2').show();
         $('#callto-id').focus();
     }
@@ -248,7 +248,7 @@ $(function() {
         existingCall = call;
         $('#their-id').text(call.remoteId);
         call.on('close', step2);
-        // $('#step1, #step2').hide();
+        $('#step1, #step2').hide();
         $('#step3').show();
     }
 });
